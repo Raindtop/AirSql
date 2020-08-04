@@ -1,0 +1,16 @@
+datasoure:
+  master:
+    driver-class:
+    url:
+    name:
+    password:
+  slave1:
+    driver-class:
+    url:
+    name:
+    password:
+  slave2:
+    driver-class:
+    url:
+    name:
+    password:
