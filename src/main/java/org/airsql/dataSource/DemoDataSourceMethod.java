@@ -1,7 +1,10 @@
 package org.airsql.dataSource;
 
+import org.airsql.domain.Configuration;
+
 import javax.sql.DataSource;
 import java.sql.Connection;
+import java.sql.SQLException;
 
 /**
  * <p>
@@ -14,6 +17,13 @@ import java.sql.Connection;
  * @since 2020/8/4
  */
 public interface DemoDataSourceMethod extends DataSource {
+
+    /**
+     * 创建连接
+     * @param configuration
+     * @return
+     */
+    Connection createConnection(Configuration configuration) throws ClassNotFoundException, SQLException;
 
     /**
      * 获取指定url的连接

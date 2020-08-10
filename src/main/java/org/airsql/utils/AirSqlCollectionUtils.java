@@ -1,11 +1,9 @@
 package org.airsql.utils;
 
 import org.airsql.exception.AirSqlUtilsException;
+import org.apache.commons.collections4.CollectionUtils;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * <p>
@@ -48,5 +46,30 @@ public class AirSqlCollectionUtils {
             map.put(temp, (count == null) ? 1 : count + 1);
         }
         return map;
+    }
+
+    /**
+     * 获取最少的连接数ID
+     * @param userConfig
+     * @return
+     */
+    public static String findLessUseConnection(Map<String, Integer> userConfig){
+        Set<String> keySet = userConfig.keySet();
+
+        if (CollectionUtils.isEmpty(keySet)){
+            return null;
+        }
+        String maxId = "";
+        Integer maxCount = 0;
+
+        for (String key: keySet){
+            Integer count = userConfig.get(key);
+            if (count > maxCount){
+                maxId = key;
+                maxCount = count;
+            }
+        }
+
+        return maxId;
     }
 }

@@ -28,4 +28,6 @@ public class Configuration {
     private String user;
 
     private String password;
+
+    private String driverClass;
 }

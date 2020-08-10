@@ -9,11 +9,11 @@ import org.apache.commons.collections4.CollectionUtils;
 
 import java.io.PrintWriter;
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -34,10 +34,16 @@ public class DemoDataSourceMethodImpl implements DemoDataSourceMethod {
      * Max Link Count
      */
     private final int maxCount = 6;
+
     /**
-     * Connectioning Count
+     * Current Matser Connection Count;
      */
-    private int currentCount = 0;
+    private Map<String, Integer> masterCount = new ConcurrentHashMap<>();
+
+    /**
+     * Current Slave Connection Count;
+     */
+    private Map<String, Integer> slaveCount = new ConcurrentHashMap<>();
 
     /**
      * Master Connection Pool
@@ -47,48 +53,68 @@ public class DemoDataSourceMethodImpl implements DemoDataSourceMethod {
     /**
      * Slave Connection Pool
      */
-    private LinkedList<Connection> slavePool = new LinkedList<Connection>();
+    private static LinkedList<Connection> slavePool = new LinkedList<Connection>();
 
     /**
      * Master Configtion List(Get From YML File)
      */
-    private ArrayList<Configuration> masterConfig = new ArrayList<Configuration>(){{
-        add(new Configuration("master", "jdbc:mysql://120.26.187.19:3307/demo", "root", "123456"));
+    private static ArrayList<Configuration> masterConfig = new ArrayList<Configuration>(){{
+        add(new Configuration("master", "jdbc:mysql://120.26.187.19:3307/demo", "root", "123456", "com.mysql.cj.jdbc.Driver"));
     }};
 
     /**
      * Slave Configtion List(Get From YML File)
      */
-    private ArrayList<Configuration> slaveConfig = new ArrayList<Configuration>(){{
-        add(new Configuration("slave1", "jdbc:mysql://120.26.187.19:3317/demo", "root", "123456"));
-        add(new Configuration("slave2", "jdbc:mysql://120.26.187.19:3327/demo", "root", "123456"));
+    private static ArrayList<Configuration> slaveConfig = new ArrayList<Configuration>(){{
+        add(new Configuration("slave1", "jdbc:mysql://120.26.187.19:3317/demo", "root", "123456", "com.mysql.cj.jdbc.Driver"));
+        add(new Configuration("slave2", "jdbc:mysql://120.26.187.19:3327/demo", "root", "123456", "com.mysql.cj.jdbc.Driver"));
     }};
 
     /**
-     * 检查ID是否重复
+     * 启动自检
      */
-    {
-        if (CollectionUtils.isNotEmpty(masterConfig)){
-            try {
+    static {
+        try {
+            if (CollectionUtils.isEmpty(masterConfig)){
                 throw new AirSqlException("Master is Empty. Check you configuration file");
-            } catch (AirSqlException e) {
+            }
+            List<String> configId = new ArrayList<>();
+            List<String> masterConfigId = masterConfig.stream().map(config -> config.getConfigId()).collect(Collectors.toList());
+            List<String> slaveConfigId = slaveConfig.stream().map(config -> config.getConfigId()).collect(Collectors.toList());
+
+            configId.addAll(masterConfigId);
+            configId.addAll(slaveConfigId);
+
+            try {
+                AirSqlCollectionUtils.checkListCountOnlyOne(configId);
+            } catch (AirSqlUtilsException e) {
                 e.printStackTrace();
             }
-        }
-        List<String> configId = new ArrayList<>();
-        List<String> masterConfigId = masterConfig.stream().map(config -> config.getConfigId()).collect(Collectors.toList());
-        List<String> slaveConfigId = slaveConfig.stream().map(config -> config.getConfigId()).collect(Collectors.toList());
 
-        configId.addAll(masterConfigId);
-        configId.addAll(slaveConfigId);
-
-        try {
-            AirSqlCollectionUtils.checkListCountOnlyOne(configId);
-        } catch (AirSqlUtilsException e) {
+            System.out.println("AirSql Self-Check is OK.");
+        } catch (AirSqlException e) {
             e.printStackTrace();
         }
     }
 
+    public static void main(String[] args) throws AirSqlException {
+        DemoDataSourceMethod demoDataSourceMethod = new DemoDataSourceMethodImpl();
+        System.out.println("11");
+    }
+
+    /**
+     * 初始化连接数
+     */
+    public DemoDataSourceMethodImpl(){
+
+    }
+
+    @Override
+    public Connection createConnection(Configuration configuration) throws ClassNotFoundException, SQLException {
+        Class.forName(configuration.getDriverClass());
+        Connection connection = DriverManager.getConnection(configuration.getUrl(), configuration.getUser(), configuration.getPassword());
+        return connection;
+    }
 
     @Override
     public Connection getSpecifyConnection(String url, String name, String password) {
