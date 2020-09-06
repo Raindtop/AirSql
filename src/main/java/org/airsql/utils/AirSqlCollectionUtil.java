@@ -1,5 +1,6 @@
 package org.airsql.utils;
 
+import org.airsql.domain.Configuration;
 import org.airsql.exception.AirSqlUtilsException;
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -13,7 +14,7 @@ import java.util.*;
  * @author raindrop
  * @since 2020/8/4
  */
-public class AirSqlCollectionUtils {
+public class AirSqlCollectionUtil {
 
     /**
      * 检查列表中的数据是否唯一
@@ -71,5 +72,23 @@ public class AirSqlCollectionUtils {
         }
 
         return maxId;
+    }
+
+    /**
+     * 根据Id获取连接信息
+     * @param configId
+     * @param configurations
+     * @return
+     */
+    public static Configuration getConfigById(String configId, ArrayList<Configuration> configurations){
+        Configuration configuration = null;
+        for (Configuration config: configurations){
+            if (config.getConfigId().equals(configId)){
+                configuration = config;
+                break;
+            }
+        }
+
+        return configuration;
     }
 }

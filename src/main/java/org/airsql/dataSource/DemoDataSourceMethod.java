@@ -19,6 +19,21 @@ import java.sql.SQLException;
 public interface DemoDataSourceMethod extends DataSource {
 
     /**
+     * 初始化连接
+     */
+    void initConnection();
+
+    /**
+     * 初始化主服务器连接
+     */
+    void initMasterConnection();
+
+    /**
+     * 初始化从服务器连接
+     */
+    void initSlaveConnection();
+
+    /**
      * 创建连接
      * @param configuration
      * @return
@@ -35,10 +50,35 @@ public interface DemoDataSourceMethod extends DataSource {
     Connection getSpecifyConnection(String url, String name, String password);
 
     /**
+     * 执行sql
+     * @param sql
+     */
+    void execuse(String sql);
+
+    /**
      * 获取对应sql下的连接
      * @param sql
      * @return
      */
-    Connection getConnection(String sql);
+    Connection getConnection(String sql) throws InterruptedException;
+
+    /**
+     * 获取主服务器连接
+     * @return
+     */
+    Connection getMasterConnection();
+
+    /**
+     * 获取从服务器连接
+     * @return
+     */
+    Connection getSlaveConnection();
+
+    /**
+     * 关闭连接
+     * @param connection
+     * @param configId
+     */
+    void closeConnection(Connection connection, String configId);
 
 }

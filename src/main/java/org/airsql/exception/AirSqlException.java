@@ -8,7 +8,7 @@ package org.airsql.exception;
  * @author raindrop
  * @since 2020/8/4
  */
-public class AirSqlException extends Exception{
+public class AirSqlException extends RuntimeException{
 
     public AirSqlException() {
     }

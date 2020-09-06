@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.airsql.dataSource.common.ConfigType;
 
 /**
  * <p>
@@ -22,6 +23,8 @@ public class Configuration {
      * 配置ID(唯一）
      */
     private String configId;
+
+    private ConfigType configType;
 
     private String url;
 
